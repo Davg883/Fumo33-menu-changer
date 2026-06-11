@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+import tempfile
 from pathlib import Path
 from jinja2 import Template
 
@@ -14,13 +15,40 @@ except ImportError:
 
 def install_playwright_browser():
     """Ensure the headless Chromium browser is installed."""
+    flag_file = os.path.join(tempfile.gettempdir(), "playwright_installed.flag")
+    if os.path.exists(flag_file):
+        return
+        
     try:
+        # Check if browser is available
         with sync_playwright() as p:
             p.chromium.launch()
+        # Create flag file
+        with open(flag_file, "w") as f:
+            f.write("installed")
     except Exception:
         print("Playwright Chromium browser not found. Installing it now...")
-        subprocess.check_call([sys.executable, "-m", "playwright", "install", "chromium"])
-        print("Chromium browser installed successfully!")
+        try:
+            # Run the silent install command using the active python executable
+            subprocess.run(
+                [sys.executable, "-m", "playwright", "install", "chromium"],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+            # Create flag file
+            with open(flag_file, "w") as f:
+                f.write("installed")
+            print("Chromium browser installed successfully!")
+        except Exception as e:
+            # Fallback to standard command-line call if sys.executable fails
+            try:
+                subprocess.run(["playwright", "install", "chromium"], check=True)
+                with open(flag_file, "w") as f:
+                    f.write("installed")
+                print("Chromium browser installed successfully via fallback!")
+            except Exception as inner_e:
+                raise RuntimeError(f"Playwright auto-installation failed: {str(e)} | Inner: {str(inner_e)}")
 
 # HTML & CSS Template for Social Media Posts
 SOCIAL_TEMPLATE = """
