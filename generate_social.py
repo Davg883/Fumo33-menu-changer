@@ -1,518 +1,505 @@
 import os
-import sys
-import subprocess
-import tempfile
+import io
+import textwrap
 from pathlib import Path
-from jinja2 import Template
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
-# Ensure Playwright dependencies are set up
-try:
-    from playwright.sync_api import sync_playwright
-except ImportError:
-    print("Playwright is not installed. Installing it now...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "playwright"])
-    from playwright.sync_api import sync_playwright
+# ──────────────────────────────────────────────
+# Brand Colour Palette
+# ──────────────────────────────────────────────
+GOLD = (212, 175, 55)          # #D4AF37
+GOLD_BRIGHT = (242, 201, 76)   # #F2C94C
+OFF_WHITE = (250, 247, 240)    # #FAF7F0
+SILVER = (192, 192, 192)       # #C0C0C0
+DARK_BG = (17, 17, 17)        # #111111
 
-def install_playwright_browser():
-    """Ensure the headless Chromium browser is installed."""
-    flag_file = os.path.join(tempfile.gettempdir(), "playwright_installed.flag")
-    if os.path.exists(flag_file):
-        return
-        
+# ──────────────────────────────────────────────
+# Font Helpers — works on Linux (Streamlit Cloud), macOS, and Windows
+# ──────────────────────────────────────────────
+_font_cache = {}
+
+def _find_system_font(preferred_names, fallback="arial.ttf"):
+    """Search common system font directories for a TTF/OTF file."""
+    search_dirs = [
+        # Linux (Streamlit Cloud uses Debian/Ubuntu)
+        "/usr/share/fonts",
+        "/usr/local/share/fonts",
+        # macOS
+        "/Library/Fonts",
+        "/System/Library/Fonts",
+        os.path.expanduser("~/Library/Fonts"),
+        # Windows
+        os.path.join(os.environ.get("WINDIR", "C:\\Windows"), "Fonts"),
+    ]
+    for name in preferred_names:
+        for d in search_dirs:
+            if not os.path.isdir(d):
+                continue
+            for root, _, files in os.walk(d):
+                for f in files:
+                    if f.lower() == name.lower():
+                        return os.path.join(root, f)
+    # Last resort fallback
+    for d in search_dirs:
+        if not os.path.isdir(d):
+            continue
+        for root, _, files in os.walk(d):
+            for f in files:
+                if f.lower().endswith((".ttf", ".otf")):
+                    return os.path.join(root, f)
+    return None
+
+def _get_font(style="sans", size=24):
+    """Return a PIL ImageFont for the given style and size."""
+    cache_key = (style, size)
+    if cache_key in _font_cache:
+        return _font_cache[cache_key]
+
+    if style == "serif":
+        # Cinzel-like: prefer a serif with uppercase character
+        candidates = [
+            "Cinzel-Bold.ttf", "Cinzel-Regular.ttf",
+            "Georgia Bold.ttf", "georgiab.ttf", "Georgia.ttf", "georgia.ttf",
+            "Times New Roman Bold.ttf", "timesbd.ttf",
+            "Times New Roman.ttf", "times.ttf",
+            "DejaVuSerif-Bold.ttf", "DejaVuSerif.ttf",
+            "NotoSerif-Bold.ttf", "NotoSerif-Regular.ttf",
+        ]
+    else:
+        # Outfit-like: clean modern sans-serif
+        candidates = [
+            "Outfit-Regular.ttf", "Outfit-Bold.ttf",
+            "Calibri.ttf", "calibri.ttf",
+            "Segoe UI.ttf", "segoeui.ttf",
+            "Arial.ttf", "arial.ttf",
+            "DejaVuSans.ttf", "DejaVuSans-Bold.ttf",
+            "NotoSans-Regular.ttf", "NotoSans-Bold.ttf",
+            "LiberationSans-Regular.ttf",
+        ]
+
+    path = _find_system_font(candidates)
     try:
-        # Check if browser is available
-        with sync_playwright() as p:
-            p.chromium.launch()
-        # Create flag file
-        with open(flag_file, "w") as f:
-            f.write("installed")
+        if path:
+            font = ImageFont.truetype(path, size)
+        else:
+            font = ImageFont.load_default()
     except Exception:
-        print("Playwright Chromium browser not found. Installing it now...")
-        try:
-            # Run the silent install command using the active python executable
-            subprocess.run(
-                [sys.executable, "-m", "playwright", "install", "chromium"],
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
-            # Create flag file
-            with open(flag_file, "w") as f:
-                f.write("installed")
-            print("Chromium browser installed successfully!")
-        except Exception as e:
-            # Fallback to standard command-line call if sys.executable fails
-            try:
-                subprocess.run(["playwright", "install", "chromium"], check=True)
-                with open(flag_file, "w") as f:
-                    f.write("installed")
-                print("Chromium browser installed successfully via fallback!")
-            except Exception as inner_e:
-                raise RuntimeError(f"Playwright auto-installation failed: {str(e)} | Inner: {str(inner_e)}")
+        font = ImageFont.load_default()
 
-# HTML & CSS Template for Social Media Posts
-SOCIAL_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <!-- Import brand typography -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    _font_cache[cache_key] = font
+    return font
 
-    body, html {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: 'Outfit', sans-serif;
-      background-color: #111111;
-      color: #FAF7F0;
-    }
 
-    /* Background food image */
-    .bg-image {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 1;
-    }
+# ──────────────────────────────────────────────
+# Drawing Helpers
+# ──────────────────────────────────────────────
+def _draw_text_shadow(draw, xy, text, font, fill, shadow_offset=2, shadow_color=(0, 0, 0, 180)):
+    """Draw text with a drop shadow for depth."""
+    x, y = xy
+    draw.text((x + shadow_offset, y + shadow_offset), text, font=font, fill=shadow_color)
+    draw.text((x, y), text, font=font, fill=fill)
 
-    /* Dynamic gradient overlay to ensure text contrast */
-    .gradient-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-      background: {{ gradient_style }};
-    }
 
-    /* Elegant gold double border matching brand style */
-    .border-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 3;
-      padding: {{ border_padding }};
-      box-sizing: border-box;
-    }
-
-    .border-inner {
-      width: 100%;
-      height: 100%;
-      border: {{ border_style_rule }};
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: {{ content_padding }};
-      box-sizing: border-box;
-    }
-
-    /* Branding elements */
-    .brand-header {
-      text-align: center;
-      width: 100%;
-    }
-
-    .brand-name {
-      font-family: 'Cinzel', serif;
-      font-size: {{ brand_size }};
-      font-weight: 900;
-      letter-spacing: 4px;
-      color: #F2C94C; /* Gold */
-      margin-bottom: 2px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    }
-
-    .brand-tagline {
-      font-size: {{ tagline_size }};
-      font-weight: 500;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-      color: #D4AF37;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    }
-
-    /* Middle element space */
-    .middle-space {
-      flex-grow: 1;
-    }
-
-    /* Content details block */
-    .content-block {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      z-index: 4;
-    }
-
-    /* Custom promotional badges */
-    .promo-badge {
-      align-self: {{ align_self }};
-      background-color: rgba(212, 175, 55, 0.15);
-      border: 1px solid #D4AF37;
-      color: #F2C94C;
-      font-family: 'Outfit', sans-serif;
-      font-size: {{ badge_size }};
-      font-weight: 700;
-      text-transform: uppercase;
-      padding: 6px 16px;
-      border-radius: 50px;
-      letter-spacing: 1.5px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      width: fit-content;
-    }
-
-    /* Dish layout info */
-    .dish-info {
-      text-align: {{ text_align }};
-    }
-
-    .dish-title-row {
-      display: flex;
-      flex-direction: {{ title_row_direction }};
-      justify-content: {{ title_row_justify }};
-      align-items: baseline;
-      gap: 15px;
-      margin-bottom: 8px;
-    }
-
-    .dish-name {
-      font-family: 'Cinzel', serif;
-      font-size: {{ dish_size }};
-      font-weight: 700;
-      color: #FAF7F0;
-      text-shadow: 0 2px 5px rgba(0,0,0,0.6);
-      line-height: 1.15;
-    }
-
-    .dish-price {
-      font-family: 'Cinzel', serif;
-      font-size: {{ price_size }};
-      font-weight: 700;
-      color: #F2C94C;
-      text-shadow: 0 2px 5px rgba(0,0,0,0.6);
-      white-space: nowrap;
-    }
-
-    .dish-description {
-      font-size: {{ desc_size }};
-      font-weight: 300;
-      color: #C0C0C0;
-      line-height: 1.4;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-      max-width: {{ max_width_desc }};
-      margin: {{ margin_desc }};
-    }
-
-    /* Footer info */
-    .footer {
-      text-align: center;
-      width: 100%;
-      border-top: 1px dashed rgba(212, 175, 55, 0.3);
-      padding-top: 10px;
-      margin-top: 10px;
-    }
-
-    .footer-text {
-      font-size: {{ footer_size }};
-      color: #A0A0A0;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    }
-    
-    /* Layout styles specifically for landscape */
-    {% if format_name == 'landscape' %}
-    .border-inner {
-      flex-direction: row;
-      align-items: center;
-    }
-    .left-pane {
-      width: 45%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      z-index: 4;
-    }
-    .right-spacer {
-      width: 55%;
-      height: 100%;
-    }
-    {% endif %}
-  </style>
-</head>
-<body>
-  
-  <img class="bg-image" src="{{ image_url }}" alt="Background food">
-  <div class="gradient-overlay"></div>
-  
-  <div class="border-container">
-    <div class="border-inner">
-      {% if format_name == 'landscape' %}
-        <div class="left-pane">
-          <!-- Logo top left -->
-          <div>
-            <div class="brand-name" style="text-align: left; font-size: 24px;">FUMO 33</div>
-            <div class="brand-tagline" style="text-align: left; font-size: 10px;">Woodfired Kitchen</div>
-          </div>
-          
-          <!-- Dish details middle left -->
-          <div class="content-block" style="gap: 10px;">
-            {% if badge_text %}
-              <div class="promo-badge">{{ badge_text }}</div>
-            {% endif %}
-            <div class="dish-info">
-              <div class="dish-title-row">
-                <div class="dish-name">{{ dish_name }}</div>
-                <div class="dish-price">£{{ price }}</div>
-              </div>
-              <div class="dish-description" style="text-align: left; max-width: 100%;">{{ description }}</div>
-            </div>
-          </div>
-          
-          <!-- CTA bottom left -->
-          <div class="footer" style="border-top: 1px solid rgba(212, 175, 55, 0.3); padding-top: 8px; text-align: left; margin: 0;">
-            <div class="footer-text" style="text-align: left; font-size: 10px;">📍 Ryde, IOW • fumo33.co.uk</div>
-          </div>
-        </div>
-        <div class="right-spacer"></div>
-      {% else %}
-        <!-- Logo top center -->
-        <div class="brand-header">
-          <div class="brand-name">FUMO 33</div>
-          <div class="brand-tagline">Woodfired Kitchen & Bar</div>
-        </div>
-        
-        <div class="middle-space"></div>
-        
-        <!-- Dish Details bottom center -->
-        <div class="content-block">
-          {% if badge_text %}
-            <div class="promo-badge">{{ badge_text }}</div>
-          {% endif %}
-          
-          <div class="dish-info">
-            <div class="dish-title-row">
-              <div class="dish-name">{{ dish_name }}</div>
-              <div class="dish-price">£{{ price }}</div>
-            </div>
-            {% if description %}
-              <div class="dish-description">{{ description }}</div>
-            {% endif %}
-          </div>
-          
-          <div class="footer">
-            <div class="footer-text">📍 Ryde, Isle of Wight • fumo33.co.uk</div>
-          </div>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-</body>
-</html>
-"""
-
-def generate_social_post(image_path, format_name, dish_name, description, price, badge_text, overlay_opacity=0.6, border_style="double", output_path="social_post.png"):
-    """
-    Renders the Fumo 33 branded HTML and uses Playwright to capture a screenshot of the specified size.
-    Formats:
-      - square (1080 x 1080)
-      - vertical (1080 x 1920)
-      - landscape (1200 x 630)
-    """
-    print(f"Generating social post for '{dish_name}' in format '{format_name}'...")
-    
-    # Configure dimensions
-    if format_name == "square":
-        width, height = 1080, 1080
-        border_padding = "25px"
-        content_padding = "40px"
-        brand_size = "44px"
-        tagline_size = "13px"
-        align_self = "center"
-        badge_size = "13px"
-        text_align = "center"
-        title_row_direction = "column"
-        title_row_justify = "center"
-        dish_size = "48px"
-        price_size = "36px"
-        desc_size = "20px"
-        max_width_desc = "80%"
-        margin_desc = "0 auto"
-        footer_size = "12px"
-        gradient_style = f"linear-gradient(to top, rgba(17,17,17,{overlay_opacity + 0.2}) 0%, rgba(17,17,17,{overlay_opacity}) 50%, rgba(17,17,17,0) 100%)"
-    elif format_name == "vertical":
-        width, height = 1080, 1920
-        border_padding = "35px"
-        content_padding = "60px"
-        brand_size = "56px"
-        tagline_size = "16px"
-        align_self = "center"
-        badge_size = "15px"
-        text_align = "center"
-        title_row_direction = "column"
-        title_row_justify = "center"
-        dish_size = "58px"
-        price_size = "44px"
-        desc_size = "22px"
-        max_width_desc = "85%"
-        margin_desc = "0 auto"
-        footer_size = "13px"
-        gradient_style = f"linear-gradient(to top, rgba(17,17,17,{overlay_opacity + 0.25}) 0%, rgba(17,17,17,{overlay_opacity + 0.1}) 40%, rgba(17,17,17,0) 100%)"
-    elif format_name == "landscape":
-        width, height = 1200, 630
-        border_padding = "20px"
-        content_padding = "30px"
-        brand_size = "28px"
-        tagline_size = "10px"
-        align_self = "flex-start"
-        badge_size = "11px"
-        text_align = "left"
-        title_row_direction = "row"
-        title_row_justify = "space-between"
-        dish_size = "36px"
-        price_size = "30px"
-        desc_size = "16px"
-        max_width_desc = "100%"
-        margin_desc = "0"
-        footer_size = "11px"
-        # Linear left-to-right gradient overlay for text legibility
-        gradient_style = f"linear-gradient(to right, rgba(17,17,17,{overlay_opacity + 0.25}) 0%, rgba(17,17,17,{overlay_opacity}) 40%, rgba(17,17,17,0) 80%)"
+def _draw_text_centered(draw, y, text, font, fill, canvas_width, shadow=True):
+    """Draw horizontally-centered text at a given y position."""
+    bbox = draw.textbbox((0, 0), text, font=font)
+    tw = bbox[2] - bbox[0]
+    x = (canvas_width - tw) // 2
+    if shadow:
+        _draw_text_shadow(draw, (x, y), text, font, fill)
     else:
-        raise ValueError(f"Unknown format: {format_name}")
+        draw.text((x, y), text, font=font, fill=fill)
+    return bbox[3] - bbox[1]  # return text height
 
-    # Set up border rule
-    if border_style == "double":
-        border_style_rule = "3px double #D4AF37"
-    elif border_style == "solid":
-        border_style_rule = "1.5px solid #D4AF37"
-    else:
-        border_style_rule = "none"
 
-    # Convert absolute image path to file URI for Playwright
-    image_url = Path(image_path).resolve().as_uri()
+def _create_gradient_overlay(width, height, direction="bottom", base_opacity=0.6):
+    """Create a gradient RGBA overlay image."""
+    overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
 
-    # Compile Template using Jinja2
-    template = Template(SOCIAL_TEMPLATE)
-    rendered_html = template.render(
-        format_name=format_name,
-        image_url=image_url,
-        gradient_style=gradient_style,
-        border_padding=border_padding,
-        content_padding=content_padding,
-        border_style_rule=border_style_rule,
-        brand_size=brand_size,
-        tagline_size=tagline_size,
-        align_self=align_self,
-        badge_size=badge_size,
-        text_align=text_align,
-        title_row_direction=title_row_direction,
-        title_row_justify=title_row_justify,
-        dish_size=dish_size,
-        price_size=price_size,
-        desc_size=desc_size,
-        max_width_desc=max_width_desc,
-        margin_desc=margin_desc,
-        footer_size=footer_size,
-        dish_name=dish_name,
-        description=description,
-        price=price,
-        badge_text=badge_text
+    if direction == "bottom":
+        # Gradient from transparent top to dark bottom
+        for y_pos in range(height):
+            progress = y_pos / height
+            # Ease-in curve for more natural gradient
+            alpha = int(255 * base_opacity * (progress ** 1.5))
+            alpha = min(255, alpha)
+            for x_pos in range(width):
+                overlay.putpixel((x_pos, y_pos), (17, 17, 17, alpha))
+    elif direction == "left":
+        # Gradient from dark left to transparent right
+        for x_pos in range(width):
+            progress = 1.0 - (x_pos / width)
+            alpha = int(255 * base_opacity * (progress ** 1.3))
+            alpha = min(255, alpha)
+            for y_pos in range(height):
+                overlay.putpixel((x_pos, y_pos), (17, 17, 17, alpha))
+
+    return overlay
+
+
+def _create_gradient_overlay_fast(width, height, direction="bottom", base_opacity=0.6):
+    """Fast gradient using numpy-like line drawing instead of per-pixel."""
+    overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+
+    if direction == "bottom":
+        for y_pos in range(height):
+            progress = y_pos / height
+            alpha = int(255 * base_opacity * (progress ** 1.5))
+            alpha = min(255, alpha)
+            draw.line([(0, y_pos), (width, y_pos)], fill=(17, 17, 17, alpha))
+    elif direction == "left":
+        for x_pos in range(width):
+            progress = 1.0 - (x_pos / width)
+            alpha = int(255 * base_opacity * (progress ** 1.3))
+            alpha = min(255, alpha)
+            draw.line([(x_pos, 0), (x_pos, height)], fill=(17, 17, 17, alpha))
+    elif direction == "full":
+        # Full darkening overlay (uniform)
+        for y_pos in range(height):
+            alpha = int(255 * base_opacity * 0.85)
+            draw.line([(0, y_pos), (width, y_pos)], fill=(17, 17, 17, alpha))
+
+    return overlay
+
+
+def _draw_double_border(draw, width, height, padding, color=GOLD):
+    """Draw an elegant double-line border frame."""
+    # Outer border
+    draw.rectangle(
+        [padding, padding, width - padding - 1, height - padding - 1],
+        outline=color + (200,), width=2
+    )
+    # Inner border
+    inner_pad = padding + 6
+    draw.rectangle(
+        [inner_pad, inner_pad, width - inner_pad - 1, height - inner_pad - 1],
+        outline=color + (120,), width=1
     )
 
-    # Write temporary file
-    temp_html_path = os.path.abspath('temp_social_render.html')
-    with open(temp_html_path, 'w', encoding='utf-8') as f:
-        f.write(rendered_html)
 
-    # Compile using Playwright Chromium
-    install_playwright_browser()
-    
+def _draw_solid_border(draw, width, height, padding, color=GOLD):
+    """Draw a single solid border frame."""
+    draw.rectangle(
+        [padding, padding, width - padding - 1, height - padding - 1],
+        outline=color + (180,), width=2
+    )
+
+
+def _draw_badge(draw, text, xy, font, bg_color=(212, 175, 55, 40), border_color=GOLD, text_color=GOLD_BRIGHT):
+    """Draw a rounded promotional badge."""
+    x, y = xy
+    bbox = draw.textbbox((0, 0), text, font=font)
+    tw = bbox[2] - bbox[0]
+    th = bbox[3] - bbox[1]
+    pad_x, pad_y = 18, 8
+    rect = [x, y, x + tw + pad_x * 2, y + th + pad_y * 2]
+
+    # Background pill
+    draw.rounded_rectangle(rect, radius=20, fill=bg_color, outline=border_color + (200,), width=1)
+    # Text
+    draw.text((x + pad_x, y + pad_y), text, font=font, fill=text_color + (255,))
+    return rect[2] - rect[0], rect[3] - rect[1]  # width, height of badge
+
+
+# ──────────────────────────────────────────────
+# Main Image Generator — uses PIL only (no Playwright)
+# ──────────────────────────────────────────────
+def generate_social_post(image_path, format_name, dish_name, description, price, badge_text,
+                         overlay_opacity=0.6, border_style="double", output_path="social_post.png"):
+    """
+    Renders the Fumo 33 branded social post using PIL compositing.
+    Formats:
+      - square (1080 x 1080) — Instagram Feed / Facebook Post
+      - vertical (1080 x 1920) — Instagram Story / Reel
+      - landscape (1200 x 630) — Facebook Ad / Link Share
+    """
+    print(f"Generating social post for '{dish_name}' in format '{format_name}'...")
+
+    # ── Dimensions ──
+    dims = {
+        "square":    (1080, 1080),
+        "vertical":  (1080, 1920),
+        "landscape": (1200, 630),
+    }
+    if format_name not in dims:
+        raise ValueError(f"Unknown format: {format_name}")
+    width, height = dims[format_name]
+
+    # ── Font sizes scaled per format ──
+    scale_factor = {"square": 1.0, "vertical": 1.3, "landscape": 0.7}[format_name]
+    brand_font = _get_font("serif", int(44 * scale_factor))
+    tagline_font = _get_font("sans", int(14 * scale_factor))
+    badge_font = _get_font("sans", int(14 * scale_factor))
+    dish_font = _get_font("serif", int(48 * scale_factor))
+    price_font = _get_font("serif", int(36 * scale_factor))
+    desc_font = _get_font("sans", int(20 * scale_factor))
+    footer_font = _get_font("sans", int(12 * scale_factor))
+
+    # ── Step 1: Load & resize background food image ──
     try:
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
-            page.set_viewport_size({"width": width, "height": height})
-            
-            # Go to the local page
-            file_url = f"file:///{temp_html_path.replace(os.sep, '/')}"
-            page.goto(file_url)
-            
-            # Wait for network idle to ensure fonts and image are fully loaded
-            page.wait_for_load_state("networkidle")
-            
-            # Take screenshot and save to output path
-            page.screenshot(path=output_path, type="png")
-            browser.close()
-            
-        print(f"Social post graphic compiled successfully at: {output_path}")
-        return True
-        
+        bg = Image.open(image_path).convert("RGBA")
     except Exception as e:
-        print(f"Failed to generate social post graphic: {e}")
+        print(f"Failed to open image {image_path}: {e}")
         return False
-        
-    finally:
-        # Clean up temporary HTML file
-        if os.path.exists(temp_html_path):
-            os.remove(temp_html_path)
 
+    # Cover-fit: resize maintaining aspect ratio, then centre-crop
+    img_ratio = bg.width / bg.height
+    target_ratio = width / height
+    if img_ratio > target_ratio:
+        new_h = height
+        new_w = int(height * img_ratio)
+    else:
+        new_w = width
+        new_h = int(width / img_ratio)
+    bg = bg.resize((new_w, new_h), Image.LANCZOS)
+    # Centre crop
+    left = (new_w - width) // 2
+    top = (new_h - height) // 2
+    bg = bg.crop((left, top, left + width, top + height))
+
+    # ── Step 2: Apply gradient overlay ──
+    if format_name == "landscape":
+        gradient = _create_gradient_overlay_fast(width, height, direction="left", base_opacity=overlay_opacity + 0.15)
+    else:
+        gradient = _create_gradient_overlay_fast(width, height, direction="bottom", base_opacity=overlay_opacity)
+    # Also add a full-canvas light darkening for readability of top text
+    top_gradient = _create_gradient_overlay_fast(width, height, direction="full", base_opacity=0.2)
+
+    canvas = Image.alpha_composite(bg, top_gradient)
+    canvas = Image.alpha_composite(canvas, gradient)
+
+    # ── Step 3: Draw to RGBA canvas ──
+    draw = ImageDraw.Draw(canvas)
+
+    # ── Step 4: Border ──
+    border_pad = int(25 * scale_factor)
+    if border_style == "double":
+        _draw_double_border(draw, width, height, border_pad)
+    elif border_style == "solid":
+        _draw_solid_border(draw, width, height, border_pad)
+
+    content_pad = border_pad + int(20 * scale_factor)
+
+    # ── Step 5: Layout depends on format ──
+    if format_name == "landscape":
+        _render_landscape(draw, canvas, width, height, content_pad,
+                          brand_font, tagline_font, badge_font, dish_font,
+                          price_font, desc_font, footer_font,
+                          dish_name, description, price, badge_text)
+    else:
+        _render_portrait_or_square(draw, canvas, width, height, content_pad,
+                                    brand_font, tagline_font, badge_font, dish_font,
+                                    price_font, desc_font, footer_font,
+                                    dish_name, description, price, badge_text, format_name)
+
+    # ── Step 6: Save ──
+    # Ensure output directory exists
+    out_dir = os.path.dirname(output_path)
+    if out_dir and not os.path.exists(out_dir):
+        os.makedirs(out_dir, exist_ok=True)
+
+    canvas_rgb = canvas.convert("RGB")
+    canvas_rgb.save(output_path, "PNG", quality=95)
+    print(f"Social post graphic compiled successfully at: {output_path}")
+    return True
+
+
+def _render_portrait_or_square(draw, canvas, w, h, pad,
+                                brand_font, tagline_font, badge_font, dish_font,
+                                price_font, desc_font, footer_font,
+                                dish_name, description, price, badge_text, format_name):
+    """Render the square or vertical layout: brand top-centre, dish info bottom-centre."""
+
+    # ── Brand header (top centre) ──
+    y_cursor = pad + 10
+    th = _draw_text_centered(draw, y_cursor, "FUMO 33", brand_font, GOLD_BRIGHT + (255,), w)
+    y_cursor += th + 4
+    _draw_text_centered(draw, y_cursor, "W O O D F I R E D   K I T C H E N   &   B A R", tagline_font, GOLD + (220,), w)
+
+    # ── Dish info block (bottom) ──
+    # Calculate from bottom up
+    footer_text = "📍  Ryde, Isle of Wight  •  fumo33.co.uk"
+    footer_bbox = draw.textbbox((0, 0), footer_text, font=footer_font)
+    footer_h = footer_bbox[3] - footer_bbox[1]
+
+    y_footer = h - pad - footer_h - 10
+
+    # Dashed line above footer
+    line_y = y_footer - 12
+    dash_len = 8
+    gap_len = 6
+    x = pad + 20
+    while x < w - pad - 20:
+        draw.line([(x, line_y), (x + dash_len, line_y)], fill=GOLD + (80,), width=1)
+        x += dash_len + gap_len
+
+    # Footer text
+    _draw_text_centered(draw, y_footer, footer_text, footer_font, (160, 160, 160, 255), w, shadow=True)
+
+    # Description
+    y_desc_bottom = line_y - 15
+    desc_lines = []
+    if description and str(description).strip():
+        max_chars = 45 if format_name == "square" else 50
+        desc_lines = textwrap.wrap(str(description).strip(), width=max_chars)
+
+    desc_total_h = 0
+    if desc_lines:
+        line_h = draw.textbbox((0, 0), "Ay", font=desc_font)[3] - draw.textbbox((0, 0), "Ay", font=desc_font)[1]
+        desc_total_h = len(desc_lines) * (line_h + 4)
+
+    y_desc_start = y_desc_bottom - desc_total_h
+
+    for i, line in enumerate(desc_lines):
+        line_h = draw.textbbox((0, 0), line, font=desc_font)[3] - draw.textbbox((0, 0), line, font=desc_font)[1]
+        _draw_text_centered(draw, y_desc_start + i * (line_h + 4), line, desc_font, SILVER + (230,), w)
+
+    # Price
+    price_text = f"£{price}" if price and str(price).strip() else ""
+    if price_text:
+        price_bbox = draw.textbbox((0, 0), price_text, font=price_font)
+        price_h = price_bbox[3] - price_bbox[1]
+        y_price = y_desc_start - price_h - 18
+        _draw_text_centered(draw, y_price, price_text, price_font, GOLD_BRIGHT + (255,), w)
+    else:
+        y_price = y_desc_start - 10
+
+    # Dish name (may wrap on 2 lines)
+    name_text = str(dish_name).strip() if dish_name else ""
+    if name_text:
+        name_lines = textwrap.wrap(name_text, width=20)
+        name_line_h = draw.textbbox((0, 0), "Ay", font=dish_font)[3] - draw.textbbox((0, 0), "Ay", font=dish_font)[1]
+        name_total_h = len(name_lines) * (name_line_h + 4)
+        y_name = y_price - name_total_h - 10
+        for i, nl in enumerate(name_lines):
+            _draw_text_centered(draw, y_name + i * (name_line_h + 4), nl, dish_font, OFF_WHITE + (255,), w)
+    else:
+        y_name = y_price - 10
+
+    # Badge
+    if badge_text and str(badge_text).strip():
+        badge_str = str(badge_text).strip().upper()
+        badge_bbox = draw.textbbox((0, 0), badge_str, font=badge_font)
+        bw = badge_bbox[2] - badge_bbox[0]
+        bx = (w - bw - 36) // 2
+        by = y_name - 42
+        _draw_badge(draw, badge_str, (bx, by), badge_font)
+
+
+def _render_landscape(draw, canvas, w, h, pad,
+                      brand_font, tagline_font, badge_font, dish_font,
+                      price_font, desc_font, footer_font,
+                      dish_name, description, price, badge_text):
+    """Render the landscape (16:9) layout: content left pane, food image right."""
+    pane_w = int(w * 0.45)
+
+    # ── Brand (top-left) ──
+    y_cursor = pad + 8
+    _draw_text_shadow(draw, (pad + 10, y_cursor), "FUMO 33", brand_font, GOLD_BRIGHT + (255,))
+    brand_h = draw.textbbox((0, 0), "FUMO 33", font=brand_font)[3]
+    y_cursor += brand_h + 2
+    _draw_text_shadow(draw, (pad + 10, y_cursor), "W O O D F I R E D   K I T C H E N", tagline_font, GOLD + (200,))
+    tagline_h = draw.textbbox((0, 0), "Ag", font=tagline_font)[3]
+    y_cursor += tagline_h + 20
+
+    # ── Badge ──
+    if badge_text and str(badge_text).strip():
+        badge_str = str(badge_text).strip().upper()
+        y_cursor += 10
+        _draw_badge(draw, badge_str, (pad + 10, y_cursor), badge_font)
+        badge_h = draw.textbbox((0, 0), badge_str, font=badge_font)[3] + 20
+        y_cursor += badge_h + 15
+
+    # ── Dish name ──
+    name_text = str(dish_name).strip() if dish_name else ""
+    if name_text:
+        name_lines = textwrap.wrap(name_text, width=18)
+        name_line_h = draw.textbbox((0, 0), "Ay", font=dish_font)[3]
+        for nl in name_lines:
+            _draw_text_shadow(draw, (pad + 10, y_cursor), nl, dish_font, OFF_WHITE + (255,))
+            y_cursor += name_line_h + 4
+
+    # ── Price ──
+    if price and str(price).strip():
+        price_text = f"£{price}"
+        y_cursor += 6
+        _draw_text_shadow(draw, (pad + 10, y_cursor), price_text, price_font, GOLD_BRIGHT + (255,))
+        price_h = draw.textbbox((0, 0), price_text, font=price_font)[3]
+        y_cursor += price_h + 10
+
+    # ── Description ──
+    if description and str(description).strip():
+        desc_lines = textwrap.wrap(str(description).strip(), width=35)
+        desc_line_h = draw.textbbox((0, 0), "Ay", font=desc_font)[3]
+        for dl in desc_lines:
+            _draw_text_shadow(draw, (pad + 10, y_cursor), dl, desc_font, SILVER + (220,))
+            y_cursor += desc_line_h + 3
+
+    # ── Footer (bottom-left) ──
+    footer_text = "📍  Ryde, IOW  •  fumo33.co.uk"
+    footer_h = draw.textbbox((0, 0), footer_text, font=footer_font)[3]
+    y_footer = h - pad - footer_h - 10
+
+    # Dashed divider
+    line_y = y_footer - 8
+    dash_len, gap_len = 6, 4
+    x = pad + 10
+    while x < pane_w:
+        draw.line([(x, line_y), (x + dash_len, line_y)], fill=GOLD + (80,), width=1)
+        x += dash_len + gap_len
+
+    _draw_text_shadow(draw, (pad + 10, y_footer), footer_text, footer_font, (160, 160, 160, 255))
+
+
+# ──────────────────────────────────────────────
+# Automated Caption Generator
+# ──────────────────────────────────────────────
 def generate_automated_caption(tone, name, price, description, badge):
     """
     Generates structured, platform-ready social captions based on user input.
+    All inputs are sanitised before template insertion.
     """
     # 1. Clean the Badge
-    badge_clean = f"[{badge.upper()}]" if (badge and str(badge).strip()) else "[NEW DISH ALERT]"
-    
-    # 2. Clean the Name (avoid double "our" grammar bug)
-    if name and str(name).strip():
-        name_clean = str(name).strip()
-    else:
-        name_clean = "our newest creation"
-        
-    # 3. Clean the Price (safely handle currency formatting)
-    if price and str(price).strip():
-        price_val = str(price).strip()
-        # Remove any stray currency symbols to prevent double formatting
-        if price_val.startswith("£"):
-            price_val = price_val[1:]
+    badge_str = str(badge).strip() if badge else ""
+    badge_clean = f"[{badge_str.upper()}]" if badge_str else "[NEW DISH ALERT]"
+
+    # 2. Clean the Name
+    name_str = str(name).strip() if name else ""
+    name_clean = name_str if name_str else "our newest creation"
+
+    # 3. Clean the Price
+    price_str = str(price).strip() if price else ""
+    if price_str:
+        # Remove any stray currency symbols
+        if price_str.startswith("£"):
+            price_str = price_str[1:]
         try:
-            # Check if it's a valid float
-            price_clean = f"for only £{float(price_val):.2f}"
+            val = float(price_str)
+            if val > 0:
+                price_clean = f"for only £{val:.2f}"
+            else:
+                price_clean = "today"
         except ValueError:
-            price_clean = f"for only £{price_val}"
+            price_clean = f"for only £{price_str}"
     else:
         price_clean = "today"
 
     # 4. Clean the Description
-    desc_clean = f"\n\n{description}\n" if (description and str(description).strip()) else ""
+    desc_str = str(description).strip() if description else ""
+    desc_clean = f"\n\n{desc_str}\n" if desc_str else ""
 
-    # 5. Normalize Tone string for strict comparison
+    # 5. Build the "our" prefix to avoid "our our X" grammar bug
+    our_prefix = "" if "our" in name_clean.lower() else "our "
+
+    # 6. Normalise Tone string for reliable matching
     tone_normalized = str(tone).strip().lower()
 
-    # Determine which template to output
+    # ── Hype / Energetic ──
     if "hype" in tone_normalized or "energetic" in tone_normalized:
         return f"""🔥 {badge_clean} 🔥
 
-Weekend plans? Sorted. Say hello to {"our" if "our" not in name_clean.lower() else ""} mouth-watering {name_clean}! 🤤{desc_clean}
+Weekend plans? Sorted. Say hello to {our_prefix}mouth-watering {name_clean}! 🤤{desc_clean}
 Indulge {price_clean} at Fumo 33. This is the ultimate fuel to kickstart your weekend. 
 
 Tables are filling fast—don't miss out. 
@@ -522,10 +509,11 @@ Tables are filling fast—don't miss out.
 
 #Fumo33 #Ryde #IsleOfWight #IOWFood #SovereignDining #SupportLocal #IOW"""
 
+    # ── Elegant / Sophisticated ──
     elif "elegant" in tone_normalized or "sophisticated" in tone_normalized:
         return f"""✨ {badge_clean} ✨
 
-Introducing your new favorite: the {name_clean}. 
+Introducing your new favourite: the {name_clean}. 
 
 Crafted with precision, cooked over wood fire, and designed to deliver a refined dining experience.{desc_clean}
 Available {price_clean} at Fumo 33. Pairing recommendation available from our sommelier.
@@ -537,10 +525,11 @@ Experience the art of local gastronomy.
 
 #Fumo33 #Ryde #IsleOfWight #SovereignDining #BoutiqueEats #ResponsibleGastronomy"""
 
-    else:  # Local / Community Focus
+    # ── Local / Community Focus (default) ──
+    else:
         return f"""⚓ {badge_clean} • SUPPORT LOCAL ⚓
 
-We are proud to introduce our {name_clean}, built entirely on a foundation of sovereign Island sourcing.{desc_clean}
+We are proud to introduce {our_prefix}{name_clean}, built entirely on a foundation of sovereign Island sourcing.{desc_clean}
 By using hand-pressed local beef, fresh vegetables, and regional bakes, we ensure that every single pound spent at Fumo 33 remains within our circular Island economy. 
 
 Enjoy this local masterpiece {price_clean}.
@@ -550,17 +539,21 @@ Enjoy this local masterpiece {price_clean}.
 
 #Fumo33 #Ryde #IsleOfWight #SovereignDining #SupportLocal #KeepItLocal #IOWEconomy"""
 
-if __name__ == '__main__':
 
-    # Simple test run if executed directly
-    test_img = os.path.abspath("food_images/20260521_122755.jpg")
+# ──────────────────────────────────────────────
+# CLI Test
+# ──────────────────────────────────────────────
+if __name__ == '__main__':
+    test_img = os.path.abspath("food_images/Steak.jpg")
     if os.path.exists(test_img):
         generate_social_post(
             image_path=test_img,
             format_name="square",
-            dish_name="Test Woodfired Pizza",
-            description="Classic mozzarella with local basil fresh out of our stone oven.",
-            price="14.50",
+            dish_name="8oz Rump Steak",
+            description="Isle of Wight dry-aged rump, chargrilled over woodfire with hand-cut chips.",
+            price="24.50",
             badge_text="Weekend Special",
             output_path="test_social_post.png"
         )
+    else:
+        print(f"Test image not found: {test_img}")

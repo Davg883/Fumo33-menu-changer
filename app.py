@@ -1124,11 +1124,7 @@ elif app_mode == "📸 Social Post Generator":
             output_filepath = os.path.join(image_dir, output_filename)
             
             if generate_clicked:
-                with st.spinner("Compiling HTML layout & capturing screenshot using headless Chromium..."):
-                    # Call generator function
-                    import importlib
-                    import generate_social
-                    importlib.reload(generate_social)
+                with st.spinner("Compositing branded graphic using Pillow image engine..."):
                     from generate_social import generate_social_post
                     success = generate_social_post(
                         image_path=selected_img_path,
@@ -1193,12 +1189,8 @@ elif app_mode == "📸 Social Post Generator":
                     </div>
                 """, unsafe_allow_html=True)
             
-            # Generate the automated text dynamically
-            import importlib
-            import generate_social
-            importlib.reload(generate_social)
+            # Generate the automated caption using the LIVE widget state values
             from generate_social import generate_automated_caption
-            # CRITICAL FIX: Ensure we pass the exact UI state variables to the generator
             automated_copy = generate_automated_caption(
                 tone=caption_tone,
                 name=dish_name,
