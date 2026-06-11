@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ data.restaurant }} - Leaflet Menu</title>
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* 1. Page Margin Optimization for A4 Landscape */
+    @page {
+      size: A4 landscape;
+      margin: 8mm 10mm 8mm 10mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+      background-color: #111111; /* Dark charcoal */
+      color: #FAF7F0; /* Cream text */
+      line-height: 1.25;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Page container */
+    .leaflet-page {
+      height: 194mm; /* Strict limit for A4 landscape height (210mm) */
+      max-height: 194mm;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: space-between;
+      gap: 12mm;
+      padding: 10px;
+      page-break-after: always;
+      position: relative;
+    }
+
+    /* Left and Right Columns on each landscape page */
+    .leaflet-column {
+      width: 48%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Column dividers */
+    .leaflet-column-left {
+      border-right: 1px dashed rgba(212, 175, 55, 0.2);
+      padding-right: 6mm;
+    }
+
+    .leaflet-column-right {
+      padding-left: 2mm;
+    }
+
+    /* Elegant double gold borders */
+    .leaflet-border-box {
+      border: 2px double #D4AF37;
+      background-color: #151515;
+      padding: 10px 14px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      border-radius: 4px;
+    }
+
+    /* Menu Sections */
+    .menu-section {
+      margin-bottom: 8px;
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      margin-bottom: 4px;
+      border-bottom: 1.5px solid #D4AF37;
+      padding-bottom: 1px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 11pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0;
+      color: #F2C94C;
+    }
+
+    .section-subtitle {
+      font-size: 7.5pt;
+      font-style: italic;
+      color: #A0A0A0;
+      margin: 0;
+    }
+
+    .section-note {
+      font-size: 7.5pt;
+      font-style: italic;
+      color: #A0A0A0;
+      margin-bottom: 3px;
+      text-align: center;
+    }
+
+    /* Menu Item */
+    .menu-item {
+      margin-bottom: 4px;
+      page-break-inside: avoid;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-weight: 600;
+      font-size: 9pt;
+      margin-bottom: 1px;
+    }
+
+    .item-name {
+      color: #FAF7F0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .veg-tag {
+      font-size: 6.5pt;
+      font-weight: 700;
+      color: #27AE60;
+      border: 1px solid #27AE60;
+      border-radius: 2px;
+      padding: 0 2px;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .item-price {
+      font-weight: 700;
+      color: #F2C94C;
+    }
+
+    .item-description {
+      font-size: 8pt;
+      color: #C0C0C0;
+      font-weight: 300;
+      line-height: 1.15;
+    }
+
+    .item-addons {
+      font-size: 7.5pt;
+      color: #D4AF37;
+      margin-top: 1px;
+    }
+
+    /* Cover design details (Page 1 Right Column) */
+    .cover-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    .cover-logo-circle {
+      width: 110mm;
+      height: 110mm;
+      border: 2px solid #D4AF37;
+      border-radius: 50%;
+      background-color: #F2C94C; /* Gold circular background matching PDF */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      padding: 20px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+    }
+
+    .cover-brand-title {
+      font-family: 'Cinzel', serif;
+      font-size: 32pt;
+      font-weight: 900;
+      color: #111111;
+      margin: 0;
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+
+    .cover-brand-sub {
+      font-size: 10pt;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #111111;
+      border-top: 1px solid #111111;
+      margin-top: 4px;
+      padding-top: 4px;
+    }
+
+    .cover-brand-loc {
+      font-size: 8pt;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(17, 17, 17, 0.7);
+      margin-top: 2px;
+    }
+
+    .cover-hours-card {
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      background-color: #1C1C1E;
+      padding: 8px 15px;
+      border-radius: 4px;
+      width: 90%;
+      margin-bottom: 10px;
+    }
+
+    .cover-hours-title {
+      font-family: 'Cinzel', serif;
+      font-size: 10pt;
+      font-weight: 700;
+      color: #F2C94C;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .cover-hours-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      font-size: 7.5pt;
+      row-gap: 2px;
+      column-gap: 15px;
+      color: #C0C0C0;
+    }
+
+    .cover-hours-grid div:nth-child(even) {
+      text-align: right;
+    }
+
+    .cover-footer {
+      font-size: 7.5pt;
+      color: #FAF7F0;
+      line-height: 1.3;
+      border-top: 1px solid rgba(212, 175, 55, 0.3);
+      padding-top: 6px;
+      width: 90%;
+    }
+
+    .cover-footer b {
+      color: #F2C94C;
+    }
+
+    /* Extras marketing callout */
+    .extras-box {
+      border: 1px dashed #D4AF37;
+      background-color: rgba(212, 175, 55, 0.04);
+      border-radius: 4px;
+      padding: 8px 10px;
+      text-align: center;
+      font-size: 8pt;
+      margin-top: auto;
+      margin-bottom: 5px;
+      page-break-inside: avoid;
+    }
+
+    .extras-title {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      color: #F2C94C;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== PAGE 1 (TAKEOUT FRONT / COVER & BACK PANEL) ==================== -->
+  <div class="leaflet-page">
+    
+    <!-- LEFT PANEL (Wings & Gyros, Sides, Salads, Desserts Callout) -->
+    <div class="leaflet-column leaflet-column-left">
+      <div class="leaflet-border-box">
+        
+        <!-- WINGS & GYROS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Wings & Gyros</h2>
+            <p class="section-subtitle">Woodfired Specialities</p>
+          </div>
+          {% for item in data.menu.wings_gyros %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- SIDES -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Sides</h2>
+            <p class="section-subtitle">Perfect Accompaniments</p>
+          </div>
+          {% for item in data.menu.sides %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- SALADS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Salads</h2>
+            <p class="section-subtitle">Fresh & Vibrant</p>
+          </div>
+          {% for item in data.menu.salads %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- DESSERTS & EXTRAS CALLOUT -->
+        <div class="extras-box">
+          <div class="extras-title">Desserts & Extras</div>
+          <div style="color: #C0C0C0;">Please Ask Any Server About Specials,<br/>Dessert Menus or Hot Drinks</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL (Leaflet Cover Page: Golden Brand Logo, Hours, Contact Details) -->
+    <div class="leaflet-column leaflet-column-right">
+      <div class="leaflet-border-box" style="background-color: #111111; border-color: rgba(212, 175, 55, 0.5);">
+        
+        <div class="cover-container">
+          
+          <!-- Logo Circle (Golden) -->
+          <div class="cover-logo-circle">
+            <h1 class="cover-brand-title">fumo<sub>33</sub></h1>
+            <div class="cover-brand-sub">woodfired kitchen & bar</div>
+            <div class="cover-brand-loc">Ryde • Isle of Wight</div>
+          </div>
+          
+          <!-- Hours Block -->
+          <div class="cover-hours-card">
+            <div class="cover-hours-title">Opening Hours</div>
+            <div class="cover-hours-grid">
+              <div>MON - THU:</div><div>{{ data.opening_hours.mon_thu }}</div>
+              <div>FRIDAY:</div><div>{{ data.opening_hours.friday }}</div>
+              <div>SATURDAY:</div><div>{{ data.opening_hours.saturday }}</div>
+              <div>SUNDAY:</div><div>{{ data.opening_hours.sunday }}</div>
+            </div>
+          </div>
+          
+          <!-- Footer Card (Marketing & Contacts) -->
+          <div class="cover-footer">
+            <b>📍 2-33 Union Street, Ryde, PO33 2LE</b><br/>
+            📞 <b>01983 611118</b> | 🌐 <b>fumo33.co.uk</b><br/>
+            📧 <b>fumo33iow@gmail.com</b><br/>
+            <span style="font-size: 6pt; color: #7A7A7A; display: inline-block; margin-top: 5px;">🔥 Scan Table QR Codes to Order Instantly</span>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== PAGE 2 (INNER MENU SPREAD) ==================== -->
+  <div class="leaflet-page">
+    
+    <!-- LEFT PANEL (Starters & Pizzas) -->
+    <div class="leaflet-column leaflet-column-left">
+      <div class="leaflet-border-box">
+        
+        <!-- STARTERS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Starters</h2>
+            <p class="section-subtitle">To Begin your Journey</p>
+          </div>
+          {% for item in data.menu.starters %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- PIZZA -->
+        <div class="menu-section" style="margin-bottom: 0;">
+          <div class="section-header">
+            <h2 class="section-title">Woodfired Pizza</h2>
+            <p class="section-subtitle">Stone Oven Baked</p>
+          </div>
+          {% for item in data.menu.pizza %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL (Burgers & Grill, Pasta & Risotto) -->
+    <div class="leaflet-column leaflet-column-right">
+      <div class="leaflet-border-box">
+        
+        <!-- BURGERS & GRILL -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Burgers & Grill</h2>
+            <p class="section-subtitle">Premium Selections</p>
+          </div>
+          {% for item in data.menu.burgers_grill %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- PASTA & RISOTTO -->
+        <div class="menu-section" style="margin-bottom: 0;">
+          <div class="section-header">
+            <h2 class="section-title">Pasta & Risotto</h2>
+            <p class="section-subtitle">Italian Classics</p>
+          </div>
+          {% for item in data.menu.pasta_risotto %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ data.restaurant }} - Drinks & Bar Snacks</title>
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Page Configuration for A3 Portrait */
+    @page {
+      size: A3 portrait;
+      margin: 8mm 12mm 8mm 12mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 400mm;
+      max-height: 400mm;
+      overflow: hidden;
+      font-family: 'Outfit', sans-serif;
+      background-color: #111111; /* Dark charcoal */
+      color: #FAF7F0; /* Warm cream */
+      line-height: 1.25;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .menu-border {
+      border: 3px double #D4AF37; /* Double gold line */
+      background-color: #151515;
+      padding: 8px 12px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.4);
+      position: relative;
+    }
+
+    .header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 28pt;
+      font-weight: 900;
+      letter-spacing: 4px;
+      margin: 0 0 2px 0;
+      color: #F2C94C;
+    }
+
+    .header p.subtitle {
+      font-size: 9.5pt;
+      font-weight: 500;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      margin: 0 0 2px 0;
+      color: #D4AF37;
+    }
+
+    .menu-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      height: calc(100% - 62mm);
+      gap: 10mm;
+      flex-grow: 1;
+    }
+
+    .menu-column {
+      width: 49%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .menu-section {
+      margin-bottom: 8px;
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      margin-bottom: 5px;
+      border-bottom: 1.5px solid #D4AF37;
+      padding-bottom: 2px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 12pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin: 0;
+      color: #F2C94C;
+    }
+
+    .section-subtitle {
+      font-size: 7.5pt;
+      font-style: italic;
+      color: #A0A0A0;
+      margin: 0;
+    }
+
+    .menu-item {
+      margin-bottom: 4px;
+      page-break-inside: avoid;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-weight: 600;
+      font-size: 9.5pt;
+      margin-bottom: 1px;
+    }
+
+    .item-name {
+      color: #FAF7F0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .veg-tag {
+      font-size: 7pt;
+      font-weight: 700;
+      color: #27AE60;
+      border: 1px solid #27AE60;
+      border-radius: 2px;
+      padding: 0 3px;
+      line-height: 1.1;
+      text-transform: uppercase;
+    }
+
+    .item-price {
+      font-weight: 700;
+      color: #F2C94C;
+    }
+
+    .item-description {
+      font-size: 8.5pt;
+      color: #C0C0C0;
+      font-weight: 300;
+      line-height: 1.15;
+    }
+
+    .item-addons {
+      font-size: 7.5pt;
+      color: #D4AF37;
+      margin-top: 1px;
+    }
+
+    /* Column dividers and unique structures */
+    .pricing-grid {
+      display: flex;
+      gap: 15px;
+      font-size: 8.5pt;
+      color: #F2C94C;
+      font-weight: 700;
+    }
+
+    .brand-footer {
+      margin-top: auto;
+      border: 1px solid #D4AF37;
+      padding: 8px 10px;
+      background-color: #1C1C1E;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 7pt;
+      color: #A0A0A0;
+    }
+  </style>
+</head>
+<body>
+  <div class="menu-border">
+    <div class="header">
+      <h1>FUMO 33</h1>
+      <p class="subtitle">Drinks & Bar Snacks</p>
+      <p style="font-size: 8pt; letter-spacing: 2px; text-transform: uppercase; margin: 0; color: #A0A0A0;">Ryde • Isle of Wight</p>
+    </div>
+    
+    <div class="menu-container">
+      <!-- LEFT COLUMN: Bar Snacks, Cocktails, Mocktails, Shots, Soft Drinks -->
+      <div class="menu-column">
+        
+        <!-- BAR SNACKS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Bar Snacks</h2>
+            <p class="section-subtitle">Perfect Bites</p>
+          </div>
+          {% for item in data.menu.bar_snacks %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- COCKTAILS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Cocktails</h2>
+            <p class="section-subtitle">Fumo Specialty Shaken</p>
+          </div>
+          {% for item in data.menu.cocktails %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              <div class="item-description">{{ item.description }}</div>
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- MOCKTAILS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Mocktails</h2>
+            <p class="section-subtitle">Premium Alcohol Free</p>
+          </div>
+          {% for item in data.menu.mocktails %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              <div class="item-description">{{ item.description }}</div>
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- SHOTS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Shots</h2>
+            <p class="section-subtitle">Quick Cheers</p>
+          </div>
+          {% for item in data.menu.shots %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              <div class="item-description">{{ item.description }}</div>
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- SOFT DRINKS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Soft Drinks</h2>
+            <p class="section-subtitle">Refreshing Sodas & Juices</p>
+          </div>
+          {% for item in data.menu.soft_drinks %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Wines, Beers/Ciders, Spirits, Hot Drinks -->
+      <div class="menu-column">
+        
+        <!-- WINES -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Wines & Champagne</h2>
+            <p class="section-subtitle">Red, White, Rosé & Sparkling</p>
+          </div>
+          {% for item in data.menu.wines %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="pricing-grid">
+                  {% if item.price_175ml %}175ml: £{{ "%.2f"|format(item.price_175ml) }}{% endif %}
+                  {% if item.price_250ml %}250ml: £{{ "%.2f"|format(item.price_250ml) }}{% endif %}
+                  {% if item.price_125ml %}125ml: £{{ "%.2f"|format(item.price_125ml) }}{% endif %}
+                  {% if item.price_bottle %}Bt: £{{ "%.2f"|format(item.price_bottle) }}{% endif %}
+                </span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- BEERS & CIDERS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Beers & Ciders</h2>
+            <p class="section-subtitle">On Tap & Bottled</p>
+          </div>
+          {% for item in data.menu.beers_ciders %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="pricing-grid">
+                  {% if item.price_half %}1/2 Pt: £{{ "%.2f"|format(item.price_half) }}{% endif %}
+                  {% if item.price_pint %}Pt: £{{ "%.2f"|format(item.price_pint) }}{% endif %}
+                  {% if item.price %}£{{ "%.2f"|format(item.price) }}{% endif %}
+                </span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- SPIRITS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Spirits</h2>
+            <p class="section-subtitle">Gins, Rums, Whiskys & Liqueurs</p>
+          </div>
+          {% for item in data.menu.spirits %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="pricing-grid">
+                  {% if item.price_single %}Single: £{{ "%.2f"|format(item.price_single) }}{% endif %}
+                  {% if item.price_double %}Double: £{{ "%.2f"|format(item.price_double) }}{% endif %}
+                  {% if item.price %}£{{ "%.2f"|format(item.price) }}{% endif %}
+                </span>
+              </div>
+            </div>
+            {% endif %}
+          {% endfor %}
+          <div style="font-size: 7.5pt; font-style: italic; color: #A0A0A0; margin-top: 3px; text-align: center;">
+            * Spirits are served as a double unless specified otherwise.
+          </div>
+        </div>
+
+        <!-- HOT DRINKS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Hot Drinks</h2>
+            <p class="section-subtitle">Barista Coffees & Fine Teas</p>
+          </div>
+          {% for item in data.menu.hot_drinks %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="pricing-grid">
+                  {% if item.price_reg %}Reg: £{{ "%.2f"|format(item.price_reg) }}{% endif %}
+                  {% if item.price_lrg %}Lrg: £{{ "%.2f"|format(item.price_lrg) }}{% endif %}
+                  {% if item.price %}£{{ "%.2f"|format(item.price) }}{% endif %}
+                </span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- BRAND FOOTER -->
+        <div class="brand-footer">
+          <b>fumo 33 woodfired kitchen & bar</b><br/>
+          Please drink responsibly. Prices include VAT. Fomo 33 Single Source of Truth
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>

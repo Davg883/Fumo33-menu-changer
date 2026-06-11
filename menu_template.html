@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ data.restaurant }} - Menu</title>
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* 1. Page Margin Optimization for A3 Portrait with 3-inch Bottom Cutoff */
+    @page {
+      size: 297mm 496mm; /* Custom A3 Extra height (A3 420mm + 76mm cutoff) */
+      margin: 8mm 12mm 88mm 12mm; /* 88mm bottom margin includes the 3-inch (76mm) cutoff zone + 12mm margin */
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    /* 2. Hard Stop Container Heights to prevent spillover onto Page 2 */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 400mm; /* Keep strictly under A3's 420mm height limit */
+      max-height: 400mm;
+      overflow: hidden;
+      font-family: 'Outfit', sans-serif;
+      background-color: #111111; /* Sleek, dark mode background */
+      color: #FAF7F0; /* Premium warm cream text */
+      line-height: 1.25;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Outer elegant border for fine-dining look, strictly constrained to body height */
+    .menu-border {
+      border: 3px double #D4AF37; /* Elegant double gold line */
+      background-color: #151515; /* Sightly lighter charcoal fill */
+      padding: 8px 12px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Compact Header Block */
+    .header {
+      text-align: center;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.4);
+      position: relative;
+    }
+
+    .header::after {
+      content: "";
+      position: absolute;
+      bottom: -3px;
+      left: 46%;
+      width: 8%;
+      height: 4px;
+      background-color: #D4AF37;
+    }
+
+    .header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 28pt; /* Compact elegant font size */
+      font-weight: 900;
+      letter-spacing: 4px;
+      margin: 0 0 2px 0;
+      color: #F2C94C; /* Rich gold highlight */
+    }
+
+    .header p.subtitle {
+      font-size: 9.5pt;
+      font-weight: 500;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      margin: 0 0 2px 0;
+      color: #D4AF37;
+    }
+
+    .header p.location {
+      font-size: 8pt;
+      font-weight: 300;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin: 0;
+      color: #A0A0A0;
+    }
+
+    /* 3. Explicit Grid/Flex Column Layout to Lock Sections in Position */
+    .menu-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      height: calc(100% - 62mm); /* Maximize height for container, keeping header clearance */
+      gap: 10mm; /* Balanced horizontal spacing */
+      flex-grow: 1;
+    }
+
+    .menu-column {
+      width: 49%; /* Keep left and right columns perfectly side-by-side */
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 4. Compacted Defensive Spacing */
+    .menu-section {
+      margin-bottom: 8px; /* Tight, defensive spacing between major categories */
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      margin-bottom: 5px;
+      border-bottom: 1.5px solid #D4AF37;
+      padding-bottom: 2px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 12pt; /* Clean, prominent, yet compacted */
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin: 0;
+      color: #F2C94C; /* Gold category headers */
+    }
+
+    .section-subtitle {
+      font-size: 7.5pt;
+      font-style: italic;
+      color: #A0A0A0;
+      margin: 0;
+      font-weight: 400;
+    }
+
+    .section-note {
+      font-size: 7.5pt;
+      font-style: italic;
+      color: #A0A0A0;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    /* Compact Menu Item Card */
+    .menu-item {
+      margin-bottom: 4px; /* Extremely tight spacing between individual dishes */
+      page-break-inside: avoid;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 9.5pt; /* Compacted text size */
+      margin-bottom: 1px;
+    }
+
+    .item-name {
+      color: #FAF7F0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .veg-tag {
+      font-size: 7pt;
+      font-weight: 700;
+      color: #27AE60; /* Vegetarian green */
+      border: 1px solid #27AE60;
+      border-radius: 2px;
+      padding: 0 3px;
+      line-height: 1.1;
+      text-transform: uppercase;
+    }
+
+    .item-price {
+      font-weight: 700;
+      color: #F2C94C; /* Gold price tags */
+    }
+
+    .item-description {
+      font-family: 'Outfit', sans-serif;
+      font-size: 8.5pt;
+      color: #C0C0C0; /* Muted silver-grey for readability */
+      font-weight: 300;
+      line-height: 1.15; /* Squeezes descriptions slightly */
+      margin-top: 1px;
+    }
+
+    .item-addons {
+      font-size: 7.5pt;
+      color: #D4AF37;
+      margin-top: 1px;
+      font-weight: 500;
+    }
+
+    /* Dashed toppings box */
+    .toppings-box {
+      border: 1px dashed #D4AF37;
+      background-color: rgba(212, 175, 55, 0.05);
+      padding: 4px 6px;
+      font-size: 7.5pt;
+      margin: 4px 0;
+      border-radius: 3px;
+      page-break-inside: avoid;
+    }
+
+    .toppings-title {
+      font-weight: 600;
+      color: #D4AF37;
+      text-transform: uppercase;
+      font-size: 7.5pt;
+      margin-bottom: 1px;
+      letter-spacing: 0.5px;
+    }
+
+    .toppings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      row-gap: 1px;
+      color: #C0C0C0;
+    }
+
+    /* Brand Logo & Hours Footer Block (Bottom Left Column) */
+    .logo-footer-block {
+      margin-top: auto; /* Push perfectly to the absolute bottom of left column */
+      border: 1px solid #D4AF37;
+      padding: 8px 10px;
+      background-color: #1C1C1E; /* Rich dark footer block fill */
+      border-radius: 4px;
+      page-break-inside: avoid;
+    }
+
+    .brand-title {
+      font-family: 'Cinzel', serif;
+      font-size: 12pt;
+      font-weight: 900;
+      text-align: center;
+      margin: 0 0 3px 0;
+      letter-spacing: 2px;
+      color: #F2C94C;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      padding-bottom: 2px;
+      text-transform: lowercase; /* Matches fumo 33 style */
+    }
+
+    .hours-container {
+      margin: 4px 0;
+    }
+
+    .hours-title {
+      font-size: 7pt;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-align: center;
+      margin-bottom: 2px;
+      color: #FAF7F0;
+    }
+
+    .hours-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      font-size: 7pt;
+      row-gap: 1px;
+      column-gap: 8px;
+      font-weight: 500;
+      color: #C0C0C0;
+    }
+
+    .hours-grid div:nth-child(even) {
+      text-align: right;
+    }
+
+    .allergy-notice {
+      font-size: 6.5pt;
+      line-height: 1.2;
+      text-align: justify;
+      color: #A0A0A0;
+      font-weight: 400;
+      border-top: 1px solid rgba(212, 175, 55, 0.2);
+      padding-top: 4px;
+      margin-top: 4px;
+    }
+
+    .service-charge {
+      font-size: 6.5pt;
+      text-align: center;
+      font-style: italic;
+      margin-top: 2px;
+      font-weight: 600;
+      color: #D4AF37;
+    }
+  </style>
+</head>
+<body>
+  <div class="menu-border">
+    <!-- Restaurant Header -->
+    <div class="header">
+      <h1>FUMO 33</h1>
+      <p class="subtitle">Woodfired Kitchen & Bar</p>
+      <p class="location">Ryde • Isle of Wight</p>
+    </div>
+    
+    <div class="menu-container">
+      <!-- LEFT COLUMN (Starters, Wings & Gyros, Pizza, and Brand Footer Block) -->
+      <div class="menu-column column-left">
+        
+        <!-- STARTERS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Starters</h2>
+            <p class="section-subtitle">To Begin your Journey</p>
+          </div>
+          
+          {% for item in data.menu.starters %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+              {% if item.addons %}
+                <div class="item-addons">
+                  {% for addon in item.addons %}
+                    + {{ addon.name }} £{{ "%.2f"|format(addon.price) }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- WINGS & GYROS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Wings & Gyros</h2>
+            <p class="section-subtitle">Woodfired Specialities</p>
+          </div>
+          
+          {% for item in data.menu.wings_gyros %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- PIZZA -->
+        <div class="menu-section" style="margin-bottom: 0;">
+          <div class="section-header">
+            <h2 class="section-title">Woodfired Pizza</h2>
+            <p class="section-subtitle">Fresh from our stone oven</p>
+          </div>
+          
+          <div class="section-note">Tomato & Mozzarella Base. Vegan Cheese available.</div>
+          
+          <!-- Extra Toppings Box -->
+          <div class="toppings-box">
+            <div class="toppings-title">Choose Extra Toppings:</div>
+            <div class="toppings-grid">
+              <div>Chicken / Tiger Prawn / Parma Ham / Chorizo</div>
+              <div style="text-align: right; font-weight: 600; color: #F2C94C;">+ £3.50</div>
+              <div>Pepperoni / Ham / Bacon</div>
+              <div style="text-align: right; font-weight: 600; color: #F2C94C;">+ £2.50</div>
+              <div>Mushrooms / Onion / Olives / Jalapeno / Peppers</div>
+              <div style="text-align: right; font-weight: 600; color: #F2C94C;">+ £1.50</div>
+            </div>
+          </div>
+
+          {% for item in data.menu.pizza %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+          
+          <div class="item-addons" style="text-align: center; margin-top: 3px; font-size: 7.5px;">
+            Add a dip? Garlic Aioli or Sriracha Mayo + £1.50
+          </div>
+        </div>
+
+        <!-- BRAND & HOURS BLOCK (Logo Footer Block at bottom of left column) -->
+        <div class="logo-footer-block">
+          <div class="brand-title">fumo 33</div>
+          
+          <div class="hours-container">
+            <div class="hours-title">Opening Hours</div>
+            <div class="hours-grid">
+              <div>MON - THU:</div><div>{{ data.opening_hours.mon_thu }}</div>
+              <div>FRIDAY:</div><div>{{ data.opening_hours.friday }}</div>
+              <div>SATURDAY:</div><div>{{ data.opening_hours.saturday }}</div>
+              <div>SUNDAY:</div><div>{{ data.opening_hours.sunday }}</div>
+            </div>
+          </div>
+          
+          <div class="allergy-notice">
+            {{ data.notes.allergy_notice }}
+          </div>
+          <div class="service-charge">
+            {{ data.notes.service_charge }}
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN (Burgers & Grill, Pasta & Risotto, Salads, Sides) -->
+      <div class="menu-column column-right">
+        
+        <!-- BURGERS & GRILL -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Burgers & Grill</h2>
+            <p class="section-subtitle">Served in a Brioche Bun with Fries & Slaw</p>
+          </div>
+          
+          {% for item in data.menu.burgers_grill %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+
+          <div class="item-addons" style="text-align: center; margin-top: 3px; font-size: 7.5px;">
+            Add an extra? Onion Rings (v) + £2.50 | Truffle Fries + £2.50 | Chorizo Dirty Fries + £5.00
+          </div>
+        </div>
+
+        <!-- PASTA & RISOTTO -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Pasta & Risotto</h2>
+            <p class="section-subtitle">Italian Classics</p>
+          </div>
+          
+          {% for item in data.menu.pasta_risotto %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- SALADS -->
+        <div class="menu-section">
+          <div class="section-header">
+            <h2 class="section-title">Salads</h2>
+            <p class="section-subtitle">Fresh & Vibrantly Styled</p>
+          </div>
+          
+          {% for item in data.menu.salads %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- SIDES -->
+        <div class="menu-section" style="margin-bottom: 0;">
+          <div class="section-header">
+            <h2 class="section-title">Sides</h2>
+            <p class="section-subtitle">Perfect Accompaniments</p>
+          </div>
+          
+          {% for item in data.menu.sides %}
+            {% if item.available %}
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">
+                  {{ item.name }}
+                  {% if item.is_vegetarian %}<span class="veg-tag">V</span>{% endif %}
+                </span>
+                <span class="item-price">£{{ "%.2f"|format(item.price) }}</span>
+              </div>
+              {% if item.description %}
+                <div class="item-description">{{ item.description }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>

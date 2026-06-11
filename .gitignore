@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Streamlit
+.streamlit/
+*.pyc
+
+# Local generated output posts (we want to commit the food photos but ignore generated output)
+food_images/test_verify_*.png
+food_images/example_burger_post.png
+food_images/social_*.png
+test_social_post.png
+temp_social_render.html
+temp_menu_render.html
+
+# OS files
+.DS_Store
+Thumbs.db

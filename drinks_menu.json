@@ -1,0 +1,865 @@
+{
+  "restaurant": "Fumo 33 Woodfired Kitchen & Bar",
+  "location": "Ryde, Isle of Wight",
+  "last_updated": "2026-06-01",
+  "menu": {
+    "bar_snacks": [
+      {
+        "name": "Marinated Olives",
+        "description": "With Garlic, Lemon & Chilli",
+        "price": 4.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Patatas Bravas",
+        "description": "With Spicy Ketchup, Add Chorizo +3.5",
+        "price": 6.5,
+        "is_vegetarian": true,
+        "available": true,
+        "addons": [
+          {
+            "name": "Chorizo",
+            "price": 3.5
+          }
+        ]
+      },
+      {
+        "name": "Salt & Pepper Squid",
+        "description": "With Tartare Sauce",
+        "price": 8.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Teriyaki Popcorn Chicken",
+        "description": "With Sesame Seeds",
+        "price": 8.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Garlic & Chilli Prawns",
+        "description": "With Peppers, Onion, & Crostini",
+        "price": 10.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Homemade Houmous",
+        "description": "Olive Oil, Sesame & Pita",
+        "price": 7.95,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Garlic Bread",
+        "description": "",
+        "price": 5.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Cheesy Garlic Bread",
+        "description": "",
+        "price": 6.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Chicken Wings (7)",
+        "description": "Choose BBQ, Gochujang Korean Style, or Chilli Salt & Garlic",
+        "price": 9.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Skinny Fries",
+        "description": "",
+        "price": 5.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Parmesan Fries",
+        "description": "",
+        "price": 6.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Dirty Fries",
+        "description": "With Sriracha Mayo, Garlic, Aioli & Jalapenos",
+        "price": 8.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Cheesy Chorizo Fries",
+        "description": "Chorizo Infused Nacho, Cheese, Jalapenos and Sriracha Mayo",
+        "price": 10.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Onion Rings",
+        "description": "",
+        "price": 5.0,
+        "is_vegetarian": true,
+        "available": true
+      }
+    ],
+    "cocktails": [
+      {
+        "name": "Espresso Martini",
+        "description": "Brandy, Kahlua, Sugar & Espresso",
+        "price": 10.5,
+        "available": true
+      },
+      {
+        "name": "Pornstar Martini",
+        "description": "Vodka, Passionfruit, Vanilla, Lime & Pineapple",
+        "price": 10.5,
+        "available": true
+      },
+      {
+        "name": "Thai Lemonade",
+        "description": "Spiced Rum, Almond, Lime, Tabasco, Coriander & Ginger Beer",
+        "price": 9.95,
+        "available": true
+      },
+      {
+        "name": "Pineapple Passion",
+        "description": "Gin, Pineapple, Passionfruit, Lime & Grenadine",
+        "price": 9.95,
+        "available": true
+      },
+      {
+        "name": "Cosmopolitan",
+        "description": "Vodka, Cointreau, Lime & Cranberry",
+        "price": 9.95,
+        "available": true
+      },
+      {
+        "name": "Brazilian Monk",
+        "description": "White Rum, Kahlua, Frangelico & Vanilla Ice Cream",
+        "price": 10.5,
+        "available": true
+      },
+      {
+        "name": "Long Island Spiced Tea",
+        "description": "Spiced Rum, Vodka, Gin, Tequila, Cointreau, Lemon & Coca Cola",
+        "price": 10.5,
+        "available": true
+      },
+      {
+        "name": "Raspberry Mojito",
+        "description": "White Rum, Chambord, Elderflower, Sugar, Fresh Mint & Lime",
+        "price": 10.5,
+        "available": true
+      },
+      {
+        "name": "Painkiller",
+        "description": "Dark Rum, Pineapple, Orange, Coconut & Lime",
+        "price": 10.5,
+        "available": true
+      },
+      {
+        "name": "Cham69",
+        "description": "Vodka, Chambord, Disaronno, Lime & Lemonade",
+        "price": 9.95,
+        "available": true
+      }
+    ],
+    "shots": [
+      {
+        "name": "Baby Guinness",
+        "description": "Baileys & Kahlua",
+        "price": 5.5,
+        "available": true
+      },
+      {
+        "name": "Jam Donut",
+        "description": "Baileys & Chambord",
+        "price": 5.5,
+        "available": true
+      },
+      {
+        "name": "Blue Kamikaze",
+        "description": "Vodka, Lemon & Blue Curacao",
+        "price": 5.5,
+        "available": true
+      }
+    ],
+    "mocktails": [
+      {
+        "name": "Thai Lime-Aid",
+        "description": "Ginger Ale, Fresh Lime, Coriander & Almond",
+        "price": 6.0,
+        "available": true
+      },
+      {
+        "name": "Homemade Lemonade",
+        "description": "Lemon, Sugar, Elderflower & Soda Water",
+        "price": 6.0,
+        "available": true
+      },
+      {
+        "name": "Bora Bora",
+        "description": "Pineapple, Grenadine & Ginger Beer",
+        "price": 6.0,
+        "available": true
+      },
+      {
+        "name": "Tropical Beach",
+        "description": "Pineapple, Lemon, Coconut & Lemonade",
+        "price": 6.0,
+        "available": true
+      },
+      {
+        "name": "Passion No-Jito",
+        "description": "Passionfruit, Lime, Sugar, Fresh Mint & Soda",
+        "price": 6.0,
+        "available": true
+      },
+      {
+        "name": "Cranberry Peach Sunrise",
+        "description": "Peach Puree, Cranberry Juice & Soda",
+        "price": 6.0,
+        "available": true
+      },
+      {
+        "name": "Blue Lemonade",
+        "description": "Blue Curacao, Lemon Juice, Elderflower Cordial & Soda",
+        "price": 6.0,
+        "available": true
+      }
+    ],
+    "wines": [
+      {
+        "name": "Rioja, Spain (Red)",
+        "description": "Berries, Floral & Juicy",
+        "price_175ml": 6.5,
+        "price_250ml": 8.5,
+        "price_bottle": 21.5,
+        "available": true
+      },
+      {
+        "name": "Merlot, France (Red)",
+        "description": "Smooth, Plummy & Fruity",
+        "price_175ml": 7.25,
+        "price_250ml": 9.0,
+        "price_bottle": 25.0,
+        "available": true
+      },
+      {
+        "name": "Montepulciano, Italy (Red)",
+        "description": "Rich, Bold & Spicy",
+        "price_175ml": 7.0,
+        "price_250ml": 8.5,
+        "price_bottle": 24.5,
+        "available": true
+      },
+      {
+        "name": "Malbec, Argentina (Red)",
+        "description": "Rustic, Savoury & Fruity",
+        "price_175ml": 8.25,
+        "price_250ml": 9.5,
+        "price_bottle": 28.0,
+        "available": true
+      },
+      {
+        "name": "Nero Rosso, Sicily (Red)",
+        "description": "Supple, Juicy & Savoury",
+        "price_bottle": 24.5,
+        "available": true
+      },
+      {
+        "name": "Shiraz, Australia (Red)",
+        "description": "Black Fruits, Silky & Smooth",
+        "price_bottle": 27.5,
+        "available": true
+      },
+      {
+        "name": "Pinot Noir (Red)",
+        "description": "Dry, Soft & Medium Bodied",
+        "price_bottle": 38.0,
+        "available": true
+      },
+      {
+        "name": "Barolo (Red)",
+        "description": "Leathery, Complex & Full Bodied",
+        "price_bottle": 47.0,
+        "available": true
+      },
+      {
+        "name": "White Zinfandel, California (Rosé)",
+        "description": "Sweet, Gentle & Balanced",
+        "price_175ml": 6.0,
+        "price_250ml": 8.0,
+        "price_bottle": 22.0,
+        "available": true
+      },
+      {
+        "name": "Pinot Grigio Blush, Italy (Rosé)",
+        "description": "Light, Summery & Dry",
+        "price_175ml": 6.5,
+        "price_250ml": 8.25,
+        "price_bottle": 23.5,
+        "available": true
+      },
+      {
+        "name": "Rioja Blanco, Spain (White)",
+        "description": "Fresh, Crisp & Floral",
+        "price_175ml": 6.25,
+        "price_250ml": 8.0,
+        "price_bottle": 21.5,
+        "available": true
+      },
+      {
+        "name": "Sauvignon Blanc, Marlborough (White)",
+        "description": "Smooth, Plummy & Fruity",
+        "price_175ml": 8.0,
+        "price_250ml": 9.75,
+        "price_bottle": 27.5,
+        "available": true
+      },
+      {
+        "name": "Pinot Grigio, Italy (White)",
+        "description": "Light, Refreshing & Citrus",
+        "price_175ml": 7.25,
+        "price_250ml": 8.75,
+        "price_bottle": 26.5,
+        "available": true
+      },
+      {
+        "name": "Vermentino, France (White)",
+        "description": "Dry, Refreshing, Citrus",
+        "price_bottle": 27.0,
+        "available": true
+      },
+      {
+        "name": "Sancerre, France (White)",
+        "description": "Crisp, Grassy & Tropical",
+        "price_bottle": 42.0,
+        "available": true
+      },
+      {
+        "name": "Gavi di Gavi, Italy (White)",
+        "description": "Dry, White Flowers & Green Apples",
+        "price_bottle": 38.0,
+        "available": true
+      },
+      {
+        "name": "Prosecco",
+        "description": "Sparkling Wine",
+        "price_125ml": 6.95,
+        "price_bottle": 28.5,
+        "available": true
+      },
+      {
+        "name": "Rose Prosecco",
+        "description": "Sparkling Wine",
+        "price_bottle": 28.5,
+        "available": true
+      },
+      {
+        "name": "Pierre Mignon Champagne",
+        "description": "Champagne",
+        "price_bottle": 60.0,
+        "available": true
+      }
+    ],
+    "beers_ciders": [
+      {
+        "name": "Birra Moretti (Draught)",
+        "description": "",
+        "price_half": 3.5,
+        "price_pint": 6.5,
+        "available": true
+      },
+      {
+        "name": "Red Stripe (Draught)",
+        "description": "",
+        "price_half": 3.5,
+        "price_pint": 6.5,
+        "available": true
+      },
+      {
+        "name": "Brooklyn IPA (Draught)",
+        "description": "",
+        "price_half": 3.5,
+        "price_pint": 6.5,
+        "available": true
+      },
+      {
+        "name": "Peroni (330ml)",
+        "description": "Bottled",
+        "price": 4.5,
+        "available": true
+      },
+      {
+        "name": "Heineken Zero",
+        "description": "Bottled Alcohol Free",
+        "price": 4.25,
+        "available": true
+      },
+      {
+        "name": "Yachtsman Ale",
+        "description": "Bottled local ale",
+        "price": 6.5,
+        "available": true
+      },
+      {
+        "name": "Wight Gold",
+        "description": "Bottled local gold ale",
+        "price": 6.5,
+        "available": true
+      },
+      {
+        "name": "Old Mout Ciders",
+        "description": "Pineapple & Raspberry / Mango & Passionfruit / Kiwi & Lime",
+        "price": 6.5,
+        "available": true
+      },
+      {
+        "name": "Super 8 Cherry (330ml)",
+        "description": "A Light Belgium Cherry Beer",
+        "price": 4.75,
+        "available": true
+      },
+      {
+        "name": "Tongerlo (330ml)",
+        "description": "A Premium Belgian Abbey Beer",
+        "price": 5.0,
+        "available": true
+      }
+    ],
+    "spirits": [
+      {
+        "name": "Mermaid / Pink / Zest (Gin)",
+        "description": "",
+        "price_single": 4.5,
+        "price_double": 9.0,
+        "available": true
+      },
+      {
+        "name": "Tanqueray (Gin)",
+        "description": "",
+        "price_single": 3.75,
+        "price_double": 7.5,
+        "available": true
+      },
+      {
+        "name": "Hendricks (Gin)",
+        "description": "",
+        "price_single": 4.25,
+        "price_double": 8.5,
+        "available": true
+      },
+      {
+        "name": "Slingsby Rubarb (Gin)",
+        "description": "",
+        "price_single": 4.5,
+        "price_double": 9.0,
+        "available": true
+      },
+      {
+        "name": "Havana 3yr (Rum)",
+        "description": "",
+        "price_single": 3.75,
+        "price_double": 7.5,
+        "available": true
+      },
+      {
+        "name": "Mermaid Spiced (Rum)",
+        "description": "",
+        "price_single": 4.5,
+        "price_double": 9.0,
+        "available": true
+      },
+      {
+        "name": "Goslings Dark (Rum)",
+        "description": "",
+        "price_single": 4.0,
+        "price_double": 8.0,
+        "available": true
+      },
+      {
+        "name": "Cut To The Spice (Rum)",
+        "description": "",
+        "price_single": 4.0,
+        "price_double": 8.0,
+        "available": true
+      },
+      {
+        "name": "Havana Especial (Rum)",
+        "description": "",
+        "price_single": 4.0,
+        "price_double": 8.0,
+        "available": true
+      },
+      {
+        "name": "Jack Daniels (Whisky)",
+        "description": "",
+        "price_single": 3.75,
+        "price_double": 7.5,
+        "available": true
+      },
+      {
+        "name": "Jamesons (Whisky)",
+        "description": "",
+        "price_single": 3.75,
+        "price_double": 7.5,
+        "available": true
+      },
+      {
+        "name": "Southern Comfort (Whisky)",
+        "description": "",
+        "price_single": 3.5,
+        "price_double": 7.0,
+        "available": true
+      },
+      {
+        "name": "Monkey Shoulder (Whisky)",
+        "description": "",
+        "price_single": 5.0,
+        "price_double": 10.0,
+        "available": true
+      },
+      {
+        "name": "Drambuie (Whisky)",
+        "description": "",
+        "price_single": 4.0,
+        "price_double": 8.0,
+        "available": true
+      },
+      {
+        "name": "Oban 14yr (Whisky)",
+        "description": "",
+        "price_single": 8.0,
+        "price_double": 16.0,
+        "available": true
+      },
+      {
+        "name": "Vecchia Brandy",
+        "description": "",
+        "price_single": 4.75,
+        "price_double": 9.5,
+        "available": true
+      },
+      {
+        "name": "Armagnac",
+        "description": "",
+        "price_single": 6.5,
+        "price_double": 12.0,
+        "available": true
+      },
+      {
+        "name": "Disarronno",
+        "description": "",
+        "price_single": 3.5,
+        "price_double": 7.0,
+        "available": true
+      },
+      {
+        "name": "Baileys",
+        "description": "",
+        "price_single": 3.5,
+        "price_double": 4.5,
+        "available": true
+      },
+      {
+        "name": "Archers",
+        "description": "",
+        "price_single": 3.5,
+        "price_double": 7.0,
+        "available": true
+      },
+      {
+        "name": "Vodka",
+        "description": "",
+        "price_single": 3.75,
+        "price_double": 7.5,
+        "available": true
+      },
+      {
+        "name": "White / Black Sambuca (Shot)",
+        "description": "",
+        "price": 5.0,
+        "available": true
+      },
+      {
+        "name": "Frangelico (Shot)",
+        "description": "",
+        "price": 5.0,
+        "available": true
+      },
+      {
+        "name": "Limoncello (Shot)",
+        "description": "",
+        "price": 4.0,
+        "available": true
+      },
+      {
+        "name": "Cazcabel Tequila (Blanco, Honey, Coffee) (Shot)",
+        "description": "",
+        "price": 4.0,
+        "available": true
+      },
+      {
+        "name": "Tequila Rose (Shot)",
+        "description": "",
+        "price": 3.5,
+        "available": true
+      }
+    ],
+    "soft_drinks": [
+      {
+        "name": "Coca Cola",
+        "description": "Glass / Draught",
+        "price": 3.25,
+        "available": true
+      },
+      {
+        "name": "Diet Coke",
+        "description": "Glass / Draught",
+        "price": 3.25,
+        "available": true
+      },
+      {
+        "name": "Lemonade",
+        "description": "Glass / Draught",
+        "price": 3.25,
+        "available": true
+      },
+      {
+        "name": "Blood Orange San Pellegrino",
+        "description": "",
+        "price": 3.75,
+        "available": true
+      },
+      {
+        "name": "Lemon San Pellegrino",
+        "description": "",
+        "price": 3.75,
+        "available": true
+      },
+      {
+        "name": "Elderflower Presse",
+        "description": "",
+        "price": 3.5,
+        "available": true
+      },
+      {
+        "name": "Appletiser",
+        "description": "",
+        "price": 3.5,
+        "available": true
+      },
+      {
+        "name": "Fanta Orange Bottle",
+        "description": "",
+        "price": 3.75,
+        "available": true
+      },
+      {
+        "name": "Coca Cola Bottle",
+        "description": "",
+        "price": 3.75,
+        "available": true
+      },
+      {
+        "name": "Coke Zero Bottle",
+        "description": "",
+        "price": 3.75,
+        "available": true
+      },
+      {
+        "name": "Sparkling Water (500ml)",
+        "description": "",
+        "price": 4.0,
+        "available": true
+      },
+      {
+        "name": "Still Water (500ml)",
+        "description": "",
+        "price": 4.0,
+        "available": true
+      },
+      {
+        "name": "Still Water (750ml)",
+        "description": "",
+        "price": 6.75,
+        "available": true
+      },
+      {
+        "name": "Ginger Beer",
+        "description": "",
+        "price": 2.95,
+        "available": true
+      },
+      {
+        "name": "Ginger Ale",
+        "description": "",
+        "price": 2.95,
+        "available": true
+      },
+      {
+        "name": "Tonic Waters",
+        "description": "Premium / Light / Mediterranean / Elderflower",
+        "price": 2.95,
+        "available": true
+      },
+      {
+        "name": "Apple Juice",
+        "description": "",
+        "price": 3.25,
+        "available": true
+      },
+      {
+        "name": "Orange Juice",
+        "description": "",
+        "price": 3.25,
+        "available": true
+      },
+      {
+        "name": "Cranberry Juice",
+        "description": "",
+        "price": 3.25,
+        "available": true
+      },
+      {
+        "name": "Pineapple Juice",
+        "description": "",
+        "price": 3.25,
+        "available": true
+      }
+    ],
+    "hot_drinks": [
+      {
+        "name": "Espresso",
+        "description": "Regular or Large",
+        "price_reg": 2.2,
+        "price_lrg": 2.75,
+        "available": true
+      },
+      {
+        "name": "Americano",
+        "description": "Regular or Large",
+        "price_reg": 2.5,
+        "price_lrg": 3.0,
+        "available": true
+      },
+      {
+        "name": "Macchiato",
+        "description": "Regular or Large",
+        "price_reg": 2.75,
+        "price_lrg": 3.1,
+        "available": true
+      },
+      {
+        "name": "Cappuccino",
+        "description": "Regular or Large",
+        "price_reg": 3.0,
+        "price_lrg": 3.5,
+        "available": true
+      },
+      {
+        "name": "Latte",
+        "description": "Regular or Large",
+        "price_reg": 3.0,
+        "price_lrg": 3.5,
+        "available": true
+      },
+      {
+        "name": "Flat White",
+        "description": "Regular or Large",
+        "price_reg": 3.2,
+        "price_lrg": 3.75,
+        "available": true
+      },
+      {
+        "name": "Mocha",
+        "description": "Regular or Large",
+        "price_reg": 3.2,
+        "price_lrg": 3.75,
+        "available": true
+      },
+      {
+        "name": "Iced Mocha",
+        "description": "",
+        "price": 4.5,
+        "available": true
+      },
+      {
+        "name": "Iced Coffee",
+        "description": "",
+        "price": 4.5,
+        "available": true
+      },
+      {
+        "name": "Affogato",
+        "description": "",
+        "price": 4.5,
+        "available": true
+      },
+      {
+        "name": "Liqueur Coffee",
+        "description": "",
+        "price": 6.0,
+        "available": true
+      },
+      {
+        "name": "Hot Chocolate",
+        "description": "Regular or Large",
+        "price_reg": 3.0,
+        "price_lrg": 3.5,
+        "available": true
+      },
+      {
+        "name": "Syrups (Hazelnut / Vanilla / Caramel)",
+        "description": "Regular or Large Addon",
+        "price_reg": 0.6,
+        "price_lrg": 0.8,
+        "available": true
+      },
+      {
+        "name": "Breakfast Tea",
+        "description": "",
+        "price": 2.0,
+        "available": true
+      },
+      {
+        "name": "Fruit Tea",
+        "description": "",
+        "price": 2.0,
+        "available": true
+      },
+      {
+        "name": "Green Tea",
+        "description": "",
+        "price": 2.0,
+        "available": true
+      },
+      {
+        "name": "Earl Grey Tea",
+        "description": "",
+        "price": 2.0,
+        "available": true
+      },
+      {
+        "name": "Peppermint Tea",
+        "description": "",
+        "price": 2.0,
+        "available": true
+      },
+      {
+        "name": "Fresh Mint Tea",
+        "description": "",
+        "price": 2.5,
+        "available": true
+      }
+    ]
+  }
+}

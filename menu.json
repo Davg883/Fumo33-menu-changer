@@ -1,0 +1,397 @@
+{
+  "restaurant": "Fumo 33 Woodfired Kitchen & Bar",
+  "location": "Ryde, Isle of Wight",
+  "last_updated": "2026-06-01",
+  "opening_hours": {
+    "mon_thu": "5pm - 9pm",
+    "friday": "5pm - 10pm",
+    "saturday": "12pm - 11pm",
+    "sunday": "5pm - 9pm"
+  },
+  "notes": {
+    "allergy_notice": "Please inform us if you have any allergies. While we do our best to reduce the risk of cross-contamination, we cannot guarantee that any of our dishes are free from allergens and therefore cannot accept any liability in this respect.",
+    "service_charge": "An additional service of 10% will be added to tables of 4 and more."
+  },
+  "menu": {
+    "starters": [
+      {
+        "name": "Marinated Olives",
+        "description": "",
+        "price": 4.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Bread Board for 2",
+        "description": "Garlic Butter, Olive Oil & Balsamic",
+        "price": 8.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Potatas Bravas",
+        "description": "with Spicy Ketchup, Add Chorizo +3.5",
+        "price": 6.5,
+        "is_vegetarian": true,
+        "available": true,
+        "addons": [
+          {
+            "name": "Chorizo",
+            "price": 3.5
+          }
+        ]
+      },
+      {
+        "name": "Smoked Haddock Arancini",
+        "description": "Served With Curry Sauce & Pea Puree",
+        "price": 8.95,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Salt & Pepper Squid",
+        "description": "Citrus Dressed Slaw, Bitter Leaves, Lime & Romesco",
+        "price": 8.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Chilli Butter Tiger Prawns",
+        "description": "Served With Remoulade & Focaccia",
+        "price": 10.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Popcorn Chicken",
+        "description": "Coriander Slaw, Peanut Dip & Sesame Seeds",
+        "price": 8.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Lamb Bon Bon",
+        "description": "Gherkin Ketchup, Pickled Cabbage & Pita",
+        "price": 10.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Beef & Dolce-latte Toast",
+        "description": "With Tomato & Watercress",
+        "price": 9.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Starter Board",
+        "description": "Hummus, Olives, Focaccia, Harissa Oil, Shallots, Peppers & Crispy Onions",
+        "price": 12.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Palline",
+        "description": "Bacon & Dolce Latte OR Tomato & Mozzarella",
+        "price": 8.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Garlic Bread",
+        "description": "Add Cheese OR Tomato & Pesto +1.45",
+        "price": 5.5,
+        "is_vegetarian": true,
+        "available": true,
+        "addons": [
+          {
+            "name": "Cheese",
+            "price": 1.45
+          },
+          {
+            "name": "Tomato & Pesto",
+            "price": 1.45
+          }
+        ]
+      }
+    ],
+    "wings_gyros": [
+      {
+        "name": "Korean Wings (7)",
+        "description": "Spicy Ketchup, Ranch & Crispy Onions",
+        "price": 9.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Lime & Sea Salt Wings (7)",
+        "description": "Ranch, Crispy Onions & Gherkin Ketchup",
+        "price": 9.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Main Wings (14) + Fries",
+        "description": "Please Choose A Flavour",
+        "price": 19.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Gyros",
+        "description": "Please Choose your filling - Slow Cooked Lamb, Slow Cooked Beef, Buttermilk Chicken, Halloumi. All Served with - Crisp Lettuce, Fire Roasted Peppers, Slaw, Ranch Dressing, Spicy Ketchup & Onions",
+        "price": 18.5,
+        "is_vegetarian": false,
+        "available": true
+      }
+    ],
+    "pizza": [
+      {
+        "name": "Margarita (Tomato & Mozzarella Base)",
+        "description": "Tomato & Mozzarella Base (Vegan Options Available)",
+        "price": 11.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "American Hot",
+        "description": "Pepperoni, Nduja, Jalapeno & Ranch Dressing",
+        "price": 18.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "The Whole Hog",
+        "description": "BBQ Pork, Pepperoni, Bacon, Peppers, Ranch & Onion",
+        "price": 18.85,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Chicken Pizza",
+        "description": "Spinach, Cheese Sauce, Red Onion, Pesto & Capers",
+        "price": 18.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Gardiniera",
+        "description": "Aubergine, Courgette, Peppers, Olives, Feta",
+        "price": 18.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Classic Calzone",
+        "description": "Ham, Pepperoni & Mushroom",
+        "price": 18.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Fumo Calzone",
+        "description": "Beef, Jalapeno, Mushroom, Mozzarella & Capers",
+        "price": 18.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Veggie Calone",
+        "description": "Mushroom, Spinach, Mozzarella, Rocquito Peppers & Olives",
+        "price": 17.5,
+        "is_vegetarian": true,
+        "available": true
+      }
+    ],
+    "burgers_grill": [
+      {
+        "name": "Classic Burger",
+        "description": "with Cheese, Bacon & Gherkin Ketchup (Served in a Brioche Bun with Fries & Slaw)",
+        "price": 19.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Fumo Smash Burger",
+        "description": "with Cheese, Crispy Bacon & Crispy Onion (Served in a Brioche Bun with Fries & Slaw)",
+        "price": 19.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Fumo Brisket Burger",
+        "description": "With Chilli Jam, Paprika & Mozzarella (Served in a Brioche Bun with Fries & Slaw)",
+        "price": 21.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Halloumi Burger",
+        "description": "Miso Mushroom & Halloumi (Served in a Brioche Bun with Fries & Slaw)",
+        "price": 19.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Chicken Shish",
+        "description": "With Fries, Salad & Slaw",
+        "price": 20.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Mixed Grill For 2",
+        "description": "Rump Steak, Ribs, Lamb Bon Bon, Chicken, Charred Sweetcorn, Fries, Onion Rings, Slaw, Chimichurri, Ranch, Spicy ketchup, Rocket, Onion & Tomato",
+        "price": 48.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "8oz Rump Steak",
+        "description": "Served With Fries, Onion Rings, Chimichurri, Ranch & Pomodoro Salad",
+        "price": 24.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "10oz Rib-eye",
+        "description": "Served With Fries, Onion Rings, Chimichurri, Ranch & Pomodoro Salad",
+        "price": 37.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Overnight Beer Braised Ribs",
+        "description": "Charred Sweetcorn, Remoulade, Fries, Spicy Ketchup, Rocket & Tomato",
+        "price": 23.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Pressed Pork Belly",
+        "description": "Bacon Jam, Pear, Herb Potato & Pork Sauce",
+        "price": 21.5,
+        "is_vegetarian": false,
+        "available": true
+      }
+    ],
+    "pasta_risotto": [
+      {
+        "name": "Penne Arrabbiata",
+        "description": "Add Chicken, Chorizo, Prawns Or Bacon",
+        "price": 12.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Mushroom Risotto",
+        "description": "Add Chicken, Chorizo, Prawns Or Bacon",
+        "price": 16.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Spaghetti Bolognese",
+        "description": "With Chilli Jam, Paprika & Mozzarella",
+        "price": 17.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Beef Tagliatelle",
+        "description": "Steak Strips, Mushroom, Cherry Tomato, Rosemary, Thyme & Cream Sauce",
+        "price": 19.95,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Chicken Tagliatelle",
+        "description": "Peppers, Olives, Roasted Almonds, Sun Dried Tomato & Basil Pesto",
+        "price": 18.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Burrata Rigatoni",
+        "description": "With Basil & Pistachio",
+        "price": 17.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Baked Cheese Gnocchi",
+        "description": "Sticky Beef, Chilli, Focaccia Toast & Crispy Slaw",
+        "price": 18.5,
+        "is_vegetarian": false,
+        "available": true
+      },
+      {
+        "name": "Ratatouille Risotto",
+        "description": "Buttermilk Chicken, Gremolata & Grana Padano",
+        "price": 17.5,
+        "is_vegetarian": false,
+        "available": true
+      }
+    ],
+    "salads": [
+      {
+        "name": "Greek Salad",
+        "description": "Add Lamb Bon Bon OR Chicken Shish",
+        "price": 19.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Fumo House Salad",
+        "description": "Tomato, Burrata, Olives, Onion & Focaccia",
+        "price": 16.5,
+        "is_vegetarian": true,
+        "available": true
+      }
+    ],
+    "sides": [
+      {
+        "name": "Skinny Fries",
+        "description": "",
+        "price": 5.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Truffle & Parmesan Fries",
+        "description": "",
+        "price": 6.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Onion Rings",
+        "description": "",
+        "price": 5.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Fumo House Salad",
+        "description": "",
+        "price": 4.95,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Dirty Fries",
+        "description": "Spicy Ketchup, Ranch & Roquito Peppers (Choose - Chorizo OR Slow Cooked Beef)",
+        "price": 8.5,
+        "is_vegetarian": true,
+        "available": true
+      },
+      {
+        "name": "Butter Sweetcorn",
+        "description": "Choose Charred. Chilli/Garlic Butter",
+        "price": 5.5,
+        "is_vegetarian": true,
+        "available": true
+      }
+    ]
+  }
+}
